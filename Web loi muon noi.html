@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gửi Chị Yêu - Cinematic Moment</title>
+    <style>
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a12; color: white;
+            display: flex; justify-content: center; align-items: center;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at center, #1b2735 0%, #090a0f 100%);
+            z-index: -1;
+        }
+
+        .container { text-align: center; z-index: 10; transition: 0.8s; }
+
+        .card {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 40px; border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+
+        input {
+            padding: 15px; border-radius: 12px; border: none;
+            width: 260px; font-size: 16px; margin-bottom: 20px;
+            text-align: center; outline: none;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff416c, #ff4b2b);
+            color: white; border: none; padding: 15px 35px;
+            border-radius: 50px; font-size: 16px; font-weight: bold;
+            cursor: pointer; transition: 0.3s; margin: 10px;
+        }
+
+        .btn:hover { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 75, 43, 0.5); }
+
+        #wish-screen {
+            display: none; position: fixed; width: 100%; height: 100%;
+            flex-direction: column; justify-content: center; align-items: center;
+            padding: 30px; box-sizing: border-box; background: rgba(0,0,0,0.8);
+        }
+
+        #final-text {
+            font-size: 1.8rem; line-height: 1.6; max-width: 800px;
+            text-align: center; font-weight: 300; min-height: 150px;
+            text-shadow: 0 0 10px rgba(255,255,255,0.3);
+        }
+
+        .hidden { display: none !important; }
+        #next-btn { opacity: 0; transition: 2s; }
+    </style>
+</head>
+<body>
+
+    <div class="stars"></div>
+
+    <div id="start-screen" class="container">
+        <div class="card">
+            <h1 style="letter-spacing: 1px; color: #ff9a9e;">GỬI CHỊ YÊU ❤️</h1>
+            <p>Nhập tên của chị để bắt đầu...</p>
+            <input type="text" id="nameInput" placeholder="Tên chị là...">
+            <br>
+            <button class="btn" onclick="startExperience()">MỞ QUÀ</button>
+        </div>
+    </div>
+
+    <div id="wish-screen">
+        <div id="final-text"></div>
+        <button id="next-btn" class="btn" onclick="nextWish()">Đọc lời chúc tiếp theo ✨</button>
+    </div>
+
+    <script>
+        let currentName = "";
+        let wishIndex = 0;
+        let isTyping = false;
+
+        function getWishes(name) {
+            return [
+                `Chị ${name} ơi, với em chị không chỉ là một người chị, mà còn là người bạn tuyệt vời nhất mà em có được.`,
+                `Em mong chị ${name} luôn giữ được nụ cười rạng rỡ này, vì nụ cười của chị có thể làm bừng sáng cả những ngày u tối nhất của em.`,
+                `Cảm ơn chị ${name} đã luôn bao dung và dìu dắt em. Thế giới này có thể ồn ào, nhưng mong chị sẽ luôn tìm thấy sự bình yên.`,
+                `Chị ${name} xứng đáng với tất cả những điều ngọt ngào nhất. Đừng bao giờ quên rằng chị là một người phụ nữ cực kỳ giỏi giang và đáng tự hào.`,
+                `Dù mai này có thế nào, em vẫn sẽ luôn ở đây ủng hộ chị ${name}. Chị cứ vững tin bước tiếp con đường mình chọn nhé!`,
+                `Câu chúc cuối cùng: Chị ${name} hãy luôn yêu thương bản thân mình thật nhiều nhé, vì chị là điều vô giá đối với gia đình và với em.`
+            ];
+        }
+
+        function startExperience() {
+            currentName = document.getElementById('nameInput').value;
+            if(!currentName) return alert("Chị chưa nhập tên kìa!");
+
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('wish-screen').style.display = 'flex';
+            
+            showWish();
+        }
+
+        function showWish() {
+            if (isTyping) return;
+            isTyping = true;
+            
+            const wishes = getWishes(currentName);
+            const wishTextElement = document.getElementById('final-text');
+            const nextBtn = document.getElementById('next-btn');
+            
+            nextBtn.style.opacity = "0";
+            wishTextElement.innerHTML = "";
+            
+            let fullContent = wishes[wishIndex];
+            let i = 0;
+
+            function type() {
+                if (i < fullContent.length) {
+                    wishTextElement.innerHTML += fullContent.charAt(i);
+                    i++;
+                    setTimeout(type, 50);
+                } else {
+                    isTyping = false;
+                    if (wishIndex < wishes.length - 1) {
+                        nextBtn.style.opacity = "1";
+                    } else {
+                        nextBtn.innerHTML = "Hết rồi ạ ❤️ Em yêu chị!";
+                        nextBtn.style.opacity = "1";
+                        nextBtn.onclick = () => location.reload();
+                    }
+                }
+            }
+            type();
+        }
+
+        function nextWish() {
+            const wishes = getWishes(currentName);
+            if (wishIndex < wishes.length - 1) {
+                wishIndex++;
+                showWish();
+            }
+        }
+    </script>
+</body>
+</html>
